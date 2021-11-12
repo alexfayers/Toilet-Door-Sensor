@@ -1,0 +1,19 @@
+html,body { height: 100% }
+
+body { font-family: "Helvetica", "Arial", sans-serf; text-align: center }
+
+h1 {font-weight: bold; font-size: 2em}
+h2 {font-weight: bold; font-size: 8em}
+h3 {font-weight: normal; color: rgb(130,130,130); font-size: 2em}
+a {text-decoration: none; color: rgb(130,130,130)}
+
+.footer {position: fixed; bottom:0; width: 100%; font-size: 1em; color: rgb(130,130,130);}
+
+.left {float: left; padding: 1em;}
+.right {float: right; padding: 1em;}
+
+.status-4 {color: rgb(166,24,24)}
+.status-3 {color: rgb(166,24,24)}
+.status-2 {color: rgb(221,131,38)}
+.status-1 {color: rgb(194,200,31)}
+.status-0 {color: rgb(68,154,31)}
