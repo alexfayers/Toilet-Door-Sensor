@@ -1,0 +1,14 @@
+[Unit]
+Description=Toilet Status
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=ubuntu
+Type=simple
+Restart=always
+WorkingDirectory=/home/ubuntu/Toilet-Door-Sensor/
+ExecStart=/usr/local/bin/python3.9 -u /home/ubuntu/Toilet-Door-Sensor/main.py
+
+[Install]
+WantedBy=multi-user.target
