@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def status():
-    with open('current_status', 'r') as status_file:
+    with open('..current_status', 'r') as status_file:
         status = status_file.read()
 
     timestamp = status.split(', ')[0]
