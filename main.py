@@ -64,7 +64,7 @@ def monitor():
             log(readable_status)
             prev_status = readable_status
 
-        time.sleep(1)
+        time.sleep(60)
 
 if __name__ == '__main__':
     monitor()
