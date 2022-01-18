@@ -20,13 +20,11 @@ def calc_average_minutes(log_filename, min_diff = 0):
 
             if previous_timestamp is not None:
                 diff = (timestamp - previous_timestamp).total_seconds()
-                minute_diff = f"{int(diff // 60)} minutes"
                 
                 if status == 'open':
                     if diff > min_diff and diff < 60 * 60 * 6:
                         total_n += 1
                         total_diff += diff
-                        # print(f"Time in toilet at {timestamp}: {minute_diff}")
                 
             previous_status = status
             previous_timestamp = timestamp
