@@ -1,6 +1,6 @@
 from datetime import datetime
 
-def calc_average_minutes(log_filename, min_diff = 60):
+def calc_average_minutes(log_filename, min_diff = 0):
     total_diff = 0
     total_n = 0
 
