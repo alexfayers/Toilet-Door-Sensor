@@ -1,6 +1,7 @@
 from datetime import datetime
 
-def calc_average_minutes(log_filename, min_diff = 0):
+
+def calc_average_minutes(log_filename, min_diff=0):
     total_diff = 0
     total_n = 0
 
@@ -9,7 +10,7 @@ def calc_average_minutes(log_filename, min_diff = 0):
 
     with open(log_filename, 'r') as status_log:
         for line in status_log:
-            
+
             timestamp, status = line.split(', ')
             status = status.strip()
 
@@ -20,12 +21,12 @@ def calc_average_minutes(log_filename, min_diff = 0):
 
             if previous_timestamp is not None:
                 diff = (timestamp - previous_timestamp).total_seconds()
-                
+
                 if status == 'open':
                     if diff > min_diff and diff < 60 * 60 * 6:
                         total_n += 1
                         total_diff += diff
-                
+
             previous_status = status
             previous_timestamp = timestamp
 

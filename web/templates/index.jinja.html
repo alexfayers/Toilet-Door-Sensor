@@ -9,14 +9,14 @@
     <body>
         <main class="container">
             <h1 class="title">Is there anyone in the toilet right now?</h1>
-                <h2 class="status {{color}}">{{status}}</h2>
-                <h3 class="subtitle"><i>{{subtext}}</i></h3>
-                <h4 class="subtitle">{{wait_message | safe}}</h4>
+                <h2 class="status {{output.color}}">{{output.status}}</h2>
+                <h3 class="subtitle"><i>{{output.subtext}}</i></h3>
+                <h4 class="subtitle">{{output.wait_message | safe}}</h4>
             </div>
         </main>
         <footer>
             <p class="footer">
-                (door was {{ 'opened' if (status == 'No') else 'closed' }} at {{timestamp}}{{ minutes_ago }})
+                (door was {{ 'opened' if (output.status == 'No') else 'closed' }} at {{output.timestamp}}{{ output.minutes_ago }})
             </p>
         </footer>
 

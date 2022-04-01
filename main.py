@@ -11,12 +11,15 @@ DEVICE_ID = json_data.get('apiDeviceID')
 
 # get oauth token
 
+
 def readable_timestamp():
     return time.strftime("%Y-%m-%d %H:%M:%S")
+
 
 def log(*args, **kwargs):
     args = [f'{readable_timestamp()} -', *args]
     print(*args, **kwargs)
+
 
 def get_oauth():
     data = tuyaPlatform(REGION, CLIENT_ID, SECRET, 'token?grant_type=1')
@@ -24,10 +27,11 @@ def get_oauth():
     if data['success'] is False:
         log('Error:', data['error'])
         exit()
-    
+
     token = data['result']['access_token']
 
     return token
+
 
 def monitor():
     token = None
@@ -65,6 +69,7 @@ def monitor():
             prev_status = readable_status
 
         time.sleep(60)
+
 
 if __name__ == '__main__':
     monitor()
