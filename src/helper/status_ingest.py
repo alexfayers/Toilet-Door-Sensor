@@ -2,6 +2,7 @@ import json
 import time
 from datetime import datetime
 import os
+from os.path import join as path_join
 
 from tuya_iot import TuyaOpenAPI, TuyaOpenMQ
 from config import (
@@ -47,10 +48,10 @@ def on_message(msg, target_device_id):
 
     readable_status = 'open' if state else 'closed'
 
-    with open('status_log', 'a') as status_file:
+    with open(path_join(DATA_DIRECTORY, 'status_log'), 'a') as status_file:
         status_file.write(f"{readable_timestamp()}, {readable_status}\n")
 
-    with open('current_status', 'w') as status_file:
+    with open(path_join(DATA_DIRECTORY, 'current_status'), 'w') as status_file:
         status_file.write(f"{readable_timestamp()}, {readable_status}")
 
     log(readable_status)
@@ -93,7 +94,7 @@ def monitor():
     # Receive device messages
 
     openmq = TuyaOpenMQ(openapi)
-    # openmq.daemon = True
+    openmq.daemon = True
     openmq.start()
     openmq.add_message_listener(lambda message: on_message(message, DEVICE_ID))
     log("Listening for messages...")
