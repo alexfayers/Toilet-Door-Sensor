@@ -7,7 +7,7 @@ from tuya_iot import TuyaOpenAPI, TuyaOpenMQ
 from config import (
     DATA_DIRECTORY,
     CONFIG_JSON,
-    # DEBUG_MODE
+    DEBUG_MODE
 )
 
 
@@ -57,10 +57,10 @@ def on_message(msg, target_device_id):
 
 
 def monitor():
-    # if DEBUG_MODE is True:
-    #     from tuya_iot import TUYA_LOGGER
-    #     import logging
-    #     TUYA_LOGGER.setLevel(logging.DEBUG)
+    if DEBUG_MODE is True:
+        from tuya_iot import TUYA_LOGGER
+        import logging
+        TUYA_LOGGER.setLevel(logging.DEBUG)
 
     if not os.path.exists(DATA_DIRECTORY):
         os.mkdir(DATA_DIRECTORY)
@@ -93,7 +93,7 @@ def monitor():
     # Receive device messages
 
     openmq = TuyaOpenMQ(openapi)
-    openmq.daemon = True
+    # openmq.daemon = True
     openmq.start()
     openmq.add_message_listener(lambda message: on_message(message, DEVICE_ID))
     log("Listening for messages...")
