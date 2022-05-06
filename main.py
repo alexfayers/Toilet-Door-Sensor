@@ -1,6 +1,13 @@
 import json
-from tinytuya.wizard import tuyaPlatform
 import time
+from datetime import datetime
+
+from tuya_iot import TuyaOpenAPI, TuyaOpenMQ
+
+# Uncomment the following lines to see logs.
+# from tuya_iot import TUYA_LOGGER
+# import logging
+# TUYA_LOGGER.setLevel(logging.DEBUG)
 
 json_data = json.loads(open('config.json').read())
 
@@ -8,8 +15,10 @@ REGION = json_data.get('apiRegion')
 CLIENT_ID = json_data.get('apiKey')
 SECRET = json_data.get('apiSecret')
 DEVICE_ID = json_data.get('apiDeviceID')
+USERNAME = json_data.get('apiUsername')
+PASSWORD = json_data.get('apiPassword')
 
-# get oauth token
+ENDPOINT = f"https://openapi.tuya{REGION}.com"
 
 
 def readable_timestamp():
@@ -21,54 +30,56 @@ def log(*args, **kwargs):
     print(*args, **kwargs)
 
 
-def get_oauth():
-    data = tuyaPlatform(REGION, CLIENT_ID, SECRET, 'token?grant_type=1')
+def on_message(msg):
+    print(msg)
+    data = msg.get('data', {})
+    device_id = data.get('devId', None)
+    if device_id is None:
+        return
+    if device_id != DEVICE_ID:
+        return
 
-    if data['success'] is False:
-        log('Error:', data['error'])
-        exit()
+    status = data.get('status', [])
+    if len(status) == 0:
+        return
+    status = status[0]
+    if status.get('code', '') != 'doorcontact_state':
+        return
+    state = status.get('value', '')
+    update_time = status.get('t', '0')
+    update_time = int(update_time)
+    if update_time == 0:
+        return
+    update_time = datetime.fromtimestamp(update_time)
 
-    token = data['result']['access_token']
+    # if state is True, door is open
+    print(f"{device_id} - {state} - {update_time}")
 
-    return token
+    readable_status = 'open' if state else 'closed'
+
+    with open('status_log', 'a') as status_file:
+        status_file.write(f"{readable_timestamp()}, {readable_status}\n")
+
+    with open('current_status', 'w') as status_file:
+        status_file.write(f"{readable_timestamp()}, {readable_status}")
+
+    log(readable_status)
 
 
 def monitor():
-    token = None
-    prev_status = None
-    while True:
-        request_success = False
+    # Initialization of Tuya OpenAPI
+    openapi = TuyaOpenAPI(ENDPOINT, CLIENT_ID, SECRET)
+    res = openapi.connect(USERNAME, PASSWORD, REGION, "smartlife")
+    if res.get('success', False) is False:
+        log("Connection failed")
+        exit(1)
 
-        while request_success is False:
-            uri = f'devices/{DEVICE_ID}/status'
-            data = tuyaPlatform(REGION, CLIENT_ID, SECRET, uri, token)
+    # Receive device messages
 
-            if data['success'] is False:
-                log("Authentication failed, fetching new oauth token")
-                request_success = False
-                token = get_oauth()
-            else:
-                request_success = True
-
-        contact_status = data['result'][0]['value']
-        battery_level = data['result'][1]['value']
-
-        assert type(contact_status) == bool
-        assert type(battery_level) == str
-
-        readable_status = 'open' if contact_status else 'closed'
-
-        if prev_status != readable_status:
-            with open('status_log', 'a') as status_file:
-                status_file.write(f"{readable_timestamp()}, {readable_status}\n")
-
-            with open('current_status', 'w') as status_file:
-                status_file.write(f"{readable_timestamp()}, {readable_status}")
-
-            log(readable_status)
-            prev_status = readable_status
-
-        time.sleep(60)
+    openmq = TuyaOpenMQ(openapi)
+    openmq.start()
+    openmq.add_message_listener(on_message)
+    log("Listening for messages...")
 
 
 if __name__ == '__main__':
