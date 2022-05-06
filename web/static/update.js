@@ -20,7 +20,7 @@ function update() {
             const timestamp = data.timestamp;
             const wait_message = data.wait_message;
             const minutes_ago = data.minutes_ago;
-            const footer_message = `(door was ${status === 'Yes' ? 'opened' : 'closed'} at ${timestamp}${minutes_ago} minutes ago)`;
+            const footer_message = `(door was ${status === 'Yes' ? 'opened' : 'closed'} at ${timestamp}${minutes_ago})`;
 
             const status_element = $("#status");
             const subtext_element = $("#subtext");
