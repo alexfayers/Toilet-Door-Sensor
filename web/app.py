@@ -8,7 +8,30 @@ app = Flask(__name__)
 
 
 @app.route('/')
-def status():
+def index():
+    return render_template(
+        'index.jinja.html'
+    )
+
+
+@app.route("/api/current")
+def current_status():
+    with open('../current_status', 'r') as status_file:
+        status = status_file.read()
+
+    status = status.split(', ')
+    timestamp = status[0].strip()
+    status = status[1].strip()
+
+    # return the data as a json object
+    return {
+        "timestamp": timestamp,
+        "status": status
+    }
+
+
+@app.route("/api/current_full")
+def current_status_full():
     with open('../current_status', 'r') as status_file:
         status = status_file.read()
 
@@ -52,26 +75,7 @@ def status():
         wait_message += f" (probably free at like <b>{future_timestamp.strftime('%H:%M')}</b>)"
         output['wait_message'] = wait_message
 
-    return render_template(
-        'index.jinja.html',
-        output=output
-    )
-
-
-@app.route("/api/current")
-def current_status():
-    with open('../current_status', 'r') as status_file:
-        status = status_file.read()
-
-    status = status.split(', ')
-    timestamp = status[0].strip()
-    status = status[1].strip()
-
-    # return the data as a json object
-    return {
-        "timestamp": timestamp,
-        "status": status
-    }
+    return output
 
 
 if __name__ == '__main__':

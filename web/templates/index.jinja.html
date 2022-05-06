@@ -4,24 +4,27 @@
         <meta charset="UTF-8"/>
         <link rel="stylesheet" href="https://picocss.com/examples/bootstrap-grid/css/pico-bootstrap-grid.min.css">
         <link rel="stylesheet" href="static/style.css"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="static/update.js"></script>
         <title>Is there anyone in the toilet right now?</title>
     </head>
     <body>
         <main class="container">
-            <h1 class="title">Is there anyone in the toilet right now?</h1>
-                <h2 class="status {{output.color}}">{{output.status}}</h2>
-                <h3 class="subtitle"><i>{{output.subtext}}</i></h3>
-                <h4 class="subtitle">{{output.wait_message | safe}}</h4>
+            <h1 class="title" style="display:none;">Is there anyone in the toilet right now?</h1>
+                <h2 id="status" class="status" style="display:none;"></h2>
+                <h3 id="subtext" class="subtitle" style="display:none;"></h3>
+                <h4 id="wait_message" class="subtitle" style="display:none;"></h4>
             </div>
         </main>
         <footer>
-            <p class="footer">
-                (door was {{ 'opened' if (output.status == 'No') else 'closed' }} at {{output.timestamp}}{{ output.minutes_ago }})
-            </p>
+            <p id="footer" class="footer" style="display:none;"></p>
         </footer>
 
         <script>
-            setTimeout(function(){ location.reload(); }, 10000);
+            document.addEventListener('DOMContentLoaded', function() {
+                update();
+                setInterval(update, 5000);
+            });
         </script>
     </body>
 </html>
