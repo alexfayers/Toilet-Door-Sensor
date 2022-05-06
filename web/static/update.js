@@ -2,11 +2,23 @@ var previous_status = null;
 
 const FADE_TIME = 1000;
 const FADE_INTERVAL = 100;
+const LOADING_RATE = 1000;
+
+
+function loadingPing() {
+    const loading_indicator = $('#loading-indicator');
+
+    const half_loading_rate = LOADING_RATE / 2;
+    loading_indicator.fadeToggle(half_loading_rate).promise().then(() => {
+        loading_indicator.fadeToggle(half_loading_rate);
+    });
+}
 
 
 function update() {
     const host = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
     const url = `${host}/api/current_full`;
+
     fetch(url)
         .then(response => response.json())
         .then(data => {
@@ -77,6 +89,9 @@ function update() {
                 }, fade_out_time + (fade_out_time > 0 ? FADE_TIME : 0));
                       
             }
+            // else {
+            //     loadingPing();
+            // }
             
         })
         .catch(error => console.error(error));

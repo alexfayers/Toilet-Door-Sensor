@@ -18,3 +18,15 @@ a {text-decoration: none; color: rgb(130,130,130)}
 .status-2 {color: rgb(221,131,38)}
 .status-1 {color: rgb(194,200,31)}
 .status-0 {color: rgb(68,154,31)}
+
+.loading {
+    display: none;
+    position: fixed;
+    top: 1em;
+    right: 1em;
+    width: 0.5em;
+    height: 0.5em;
+    background-color: rgba(0, 208, 255, 0.5);
+    border-radius: 50%;
+    z-index: 9999;
+}
