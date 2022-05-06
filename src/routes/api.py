@@ -1,22 +1,16 @@
-from flask import Flask
-from flask import render_template
-
-from src.calculations import calc_average_minutes
+from flask import Blueprint
+from src.helper.calculations import calc_average_minutes
 from datetime import datetime, timedelta
-
-app = Flask(__name__)
-
-
-@app.route('/')
-def index():
-    return render_template(
-        'index.jinja.html'
-    )
+from os.path import join as path_join
+from config import DATA_DIRECTORY
 
 
-@app.route("/api/current")
+api = Blueprint('api', __name__)
+
+
+@api.route("/api/current")
 def current_status():
-    with open('../current_status', 'r') as status_file:
+    with open(path_join(DATA_DIRECTORY, 'current_status'), 'r') as status_file:
         status = status_file.read()
 
     status = status.split(', ')
@@ -30,9 +24,9 @@ def current_status():
     }
 
 
-@app.route("/api/current_full")
+@api.route("/api/current_full")
 def current_status_full():
-    with open('../current_status', 'r') as status_file:
+    with open(path_join(DATA_DIRECTORY, 'current_status'), 'r') as status_file:
         status = status_file.read()
 
     timestamp = status.split(', ')[0]
@@ -40,7 +34,19 @@ def current_status_full():
 
     timestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S')
 
-    average_wait = calc_average_minutes('../status_log')
+    average_wait = calc_average_minutes(path_join(DATA_DIRECTORY, 'status_log'))
+
+    time_ago = (datetime.now() - timestamp).total_seconds()
+    time_ago_text = 'seconds'
+    if time_ago > 60:
+        time_ago = time_ago / 60
+        time_ago_text = 'minutes'
+        if time_ago > 60:
+            time_ago = time_ago / 60
+            time_ago_text = 'hours'
+            if time_ago > 24:
+                time_ago = time_ago / 24
+                time_ago_text = 'days'
 
     output = {
         'status': 'No',
@@ -48,7 +54,7 @@ def current_status_full():
         'subtext': 'You can probably use it',
         'timestamp': timestamp.strftime('%H:%M'),
         'wait_message':  f"Average in-use time: {average_wait} minutes",
-        'minutes_ago': f" - {int((datetime.now() - timestamp).total_seconds() // 60)} minutes ago",
+        'minutes_ago': f' - {int(time_ago)} {time_ago_text} ago',
     }
 
     if status == "closed":  # (and status != "open")
@@ -59,7 +65,7 @@ def current_status_full():
         while datetime.now() > future_timestamp:
             wait_info = f" (for usages longer than {average_wait} minutes)"
             average_wait = calc_average_minutes(
-                '../status_log', min_diff=60*average_wait)
+                path_join(DATA_DIRECTORY, 'status_log'), min_diff=60*average_wait)
             future_timestamp = timestamp + timedelta(minutes=average_wait)
 
             if future_timestamp == previous_prediction:
@@ -76,7 +82,3 @@ def current_status_full():
         output['wait_message'] = wait_message
 
     return output
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)

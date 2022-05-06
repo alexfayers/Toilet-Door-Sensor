@@ -1,24 +1,14 @@
 import json
 import time
 from datetime import datetime
+import os
 
 from tuya_iot import TuyaOpenAPI, TuyaOpenMQ
-
-# Uncomment the following lines to see logs.
-# from tuya_iot import TUYA_LOGGER
-# import logging
-# TUYA_LOGGER.setLevel(logging.DEBUG)
-
-json_data = json.loads(open('config.json').read())
-
-REGION = json_data.get('apiRegion')
-CLIENT_ID = json_data.get('apiKey')
-SECRET = json_data.get('apiSecret')
-DEVICE_ID = json_data.get('apiDeviceID')
-USERNAME = json_data.get('apiUsername')
-PASSWORD = json_data.get('apiPassword')
-
-ENDPOINT = f"https://openapi.tuya{REGION}.com"
+from config import (
+    DATA_DIRECTORY,
+    CONFIG_JSON,
+    DEBUG_MODE
+)
 
 
 def readable_timestamp():
@@ -30,13 +20,13 @@ def log(*args, **kwargs):
     print(*args, **kwargs)
 
 
-def on_message(msg):
+def on_message(msg, target_device_id):
     print(msg)
     data = msg.get('data', {})
     device_id = data.get('devId', None)
     if device_id is None:
         return
-    if device_id != DEVICE_ID:
+    if device_id != target_device_id:
         return
 
     status = data.get('status', [])
@@ -67,6 +57,32 @@ def on_message(msg):
 
 
 def monitor():
+    if DEBUG_MODE is True:
+        from tuya_iot import TUYA_LOGGER
+        import logging
+        TUYA_LOGGER.setLevel(logging.DEBUG)
+
+    if not os.path.exists(DATA_DIRECTORY):
+        os.mkdir(DATA_DIRECTORY)
+
+    if not os.path.exists(CONFIG_JSON):
+        log("Config file not found")
+        exit(1)
+
+    with open(CONFIG_JSON) as config_file:
+        json_data = json.load(config_file)
+
+    REGION = json_data.get('apiRegion')
+    CLIENT_ID = json_data.get('apiKey')
+    SECRET = json_data.get('apiSecret')
+    DEVICE_ID = json_data.get('apiDeviceID')
+    USERNAME = json_data.get('apiUsername')
+    PASSWORD = json_data.get('apiPassword')
+
+    ENDPOINT = f"https://openapi.tuya{REGION}.com"
+
+    log("Config loaded")
+
     # Initialization of Tuya OpenAPI
     openapi = TuyaOpenAPI(ENDPOINT, CLIENT_ID, SECRET)
     res = openapi.connect(USERNAME, PASSWORD, REGION, "smartlife")
@@ -78,7 +94,7 @@ def monitor():
 
     openmq = TuyaOpenMQ(openapi)
     openmq.start()
-    openmq.add_message_listener(on_message)
+    openmq.add_message_listener(lambda message: on_message(message, DEVICE_ID))
     log("Listening for messages...")
 
 

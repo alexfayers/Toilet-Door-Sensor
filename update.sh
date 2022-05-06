@@ -1,8 +1,7 @@
 #!/bin/bash
 
 if git pull origin main; then
-    echo "Updated, restarting services..."
-    sudo systemctl restart toilet_status_web
+    echo "Updated, restarting service..."
     sudo systemctl restart toilet_status
 else
     echo "Update failed"

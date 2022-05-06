@@ -2,5 +2,7 @@
     "apiKey": "xxx",
     "apiSecret": "xxx",
     "apiRegion": "xxx",
-    "apiDeviceID": "xxx"
+    "apiDeviceID": "xxx",
+    "apiUsername": "xxx@xxx.xxx",
+    "apiPassword": "xxx"
 }

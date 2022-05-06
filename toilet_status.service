@@ -8,7 +8,7 @@ User=ubuntu
 Type=simple
 Restart=always
 WorkingDirectory=/home/ubuntu/Toilet-Door-Sensor/
-ExecStart=/usr/local/bin/python3.9 -u /home/ubuntu/Toilet-Door-Sensor/main.py
+ExecStart=/home/ubuntu/.local/bin/gunicorn --worker-class gevent -b 0.0.0.0:6969 src.app:app
 
 [Install]
 WantedBy=multi-user.target
