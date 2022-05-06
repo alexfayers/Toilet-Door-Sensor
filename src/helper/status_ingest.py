@@ -93,6 +93,7 @@ def monitor():
     # Receive device messages
 
     openmq = TuyaOpenMQ(openapi)
+    openmq.daemon = True
     openmq.start()
     openmq.add_message_listener(lambda message: on_message(message, DEVICE_ID))
     log("Listening for messages...")
